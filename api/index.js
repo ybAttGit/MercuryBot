@@ -32,7 +32,7 @@ router.get('/support/fix-issue/:scenario_id', function (req, res) {
     log('Received request to fix issue for incident id ' + req.params.scenario_id);
     handleIssue(req.params.scenario_id).then(
         resolved=>{
-            res.json('Issue solved')
+            res.json({messages:{text:''}})
         }
     )
 });
