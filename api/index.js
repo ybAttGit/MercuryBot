@@ -124,6 +124,9 @@ const messagesTemplate = {
 //=========[ISSUE HANDLING/SUPPORT]==============
 async function handleIssue(incidentId)
 {
+    for (i = 0; i < 60; i++) {
+        console.log(' ');
+    }
     await sleep(3000);
     log('Processing request, analyzing issue data...');
     await sleep(3000);
