@@ -32,7 +32,7 @@ router.get('/support/fix-issue/:scenario_id', function (req, res) {
     log('Received request to fix issue for incident id ' + req.params.scenario_id);
     handleIssue(req.params.scenario_id).then(
         resolved=>{
-            res.json({messages:{text:''}})
+            res.json({messages:[{text:''}]})
         }
     )
 });
@@ -127,13 +127,13 @@ async function handleIssue(incidentId)
     for (i = 0; i < 60; i++) {
         console.log(' ');
     }
-    await sleep(3000);
+    await sleep(1000);
     log('Processing request, analyzing issue data...');
-    await sleep(3000);
+    await sleep(1000);
     log('Contacting relevant support personal...');
-    await sleep(3000);
+    await sleep(1000);
     log('Issue fix found, applying fix...')
-    await sleep(3000);
+    await sleep(1000);
     log('Issue fixed, sending report...');
 
 }
