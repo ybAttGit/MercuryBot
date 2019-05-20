@@ -12,28 +12,17 @@ var port = process.env.PORT || 8080;        // set our port
 var router = express.Router();              // get an instance of the express Router
 router.get('/products/:scenario_id', function (req, res) {
     console.log('Received request for products for scenario ' + req.params.scenario_id);
-    switch (req.params.scenario_id.toLowerCase()) {
-        case 'tom':
-            res.json(tomProducts);
-            break;
-        default:
-            res.json(benProducts);
-            break;
-    }
+    //Step # 1 : get products
+    let productsToRender = getProductsForScenario(req.params.scenario_id.toLowerCase());
+    //Step # 2 : Parse response
+    let messages = buildTextMessages(tomProductsDetails);
+    res.json(messages);
 });
 
 router.get('/products-images/:scenario_id', function (req, res) {
     console.log('Received request for products with images for scenario ' + req.params.scenario_id);
     //Step # 1 : get products
-    let productsToRender = {};
-    switch (req.params.scenario_id.toLowerCase()) {
-        case 'tom':
-            productsToRender = tomProductsDetails;
-            break;
-        default:
-            productsToRender = benProductsDetails;
-            break;
-    }
+    let productsToRender = getProductsForScenario(req.params.scenario_id.toLowerCase());
     //Step # 2 : Parse response
     let messages = buildImageMessages(tomProductsDetails);
     res.json(messages);
@@ -63,16 +52,23 @@ const tomProductsDetails = [{
     subtitle: 'After 10 years of mobile pioneering firsts, it\'s time to meet our latest and greatest innovation yet.',
     url: 'https://www.att.com/buy/phones/samsung-galaxy-s10-plus-128gb-prism-white.html'
 }];
+function getProductsForScenario(scenarioId) {
+    let productsForScenario = {};
+    switch (scenarioId) {
+        case 'tom':
+            productsForScenario = tomProductsDetails;
+            break;
+        default:
+            productsForScenario = benProductsDetails;
+            break;
+    }
+    return productsForScenario;
+}
 function buildImageElement(product) {
     return {
         "title": product.title,
         "image_url": product.imageUrl,
         "subtitle": product.subtitle,
-        "default_action": {
-            "type": "web_url",
-            "url": "https://rockets.chatfuel.com/store",
-            "messenger_extensions": true
-        },
         "buttons": [
             {
                 "type": "web_url",
@@ -82,7 +78,9 @@ function buildImageElement(product) {
         ]
     }
 }
-
+function buildTextElement(product) {
+    return {'text':product.title};
+}
 function buildImageMessages(products) {
     let accumElements = [];
     for (i = 0; i < products.length; i++) {
@@ -93,14 +91,22 @@ function buildImageMessages(products) {
     messagesTemplate.messages[0].attachment.payload.elements = accumElements;
     return messagesTemplate;
 }
+function buildTextMessages(products) {
+    let accumTexts = [];
+    for (i = 0; i < products.length; i++) {
+        accumTexts.push(buildTextElement(products[i]));
+    }
+    console.log(accumTexts);
+    return {messages: accumTexts};
+}
 const messagesTemplate = {
     messages: [
         {
             attachment: {
                 type: "template",
                 payload: {
-                    template_type: "list",
-                    top_element_style: "large",
+                    template_type: "generic",
+                    image_aspect_ratio: "square",
                     elements: []
                 }
             }
