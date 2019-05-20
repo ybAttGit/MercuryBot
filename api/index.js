@@ -1,45 +1,35 @@
+//Imports
 var express = require('express');        // call express
 var app = express();                 // define our app using express
 var bodyParser = require('body-parser');
-
+//App Setup
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 var port = process.env.PORT || 8080;        // set our port
-
-// ROUTES FOR OUR API
-// =============================================================================
 var router = express.Router();              // get an instance of the express Router
+//============[ROUTES]===============
 router.get('/products/:scenario_id', function (req, res) {
-    console.log('Received request for products for scenario ' + req.params.scenario_id);
+    log('Received request for products for user ' + req.params.scenario_id);
     //Step # 1 : get products
     let productsToRender = getProductsForScenario(req.params.scenario_id.toLowerCase());
     //Step # 2 : Parse response
-    let messages = buildTextMessages(tomProductsDetails);
+    let messages = buildTextMessages(productsToRender);
     res.json(messages);
 });
-
 router.get('/products-images/:scenario_id', function (req, res) {
-    console.log('Received request for products with images for scenario ' + req.params.scenario_id);
+    log('Received request for products with images for user ' + req.params.scenario_id);
     //Step # 1 : get products
     let productsToRender = getProductsForScenario(req.params.scenario_id.toLowerCase());
     //Step # 2 : Parse response
-    let messages = buildImageMessages(tomProductsDetails);
+    let messages = buildImageMessages(productsToRender);
     res.json(messages);
 });
-
-// REGISTER OUR ROUTES -------------------------------
-// all of our routes will be prefixed with /api
 app.use('/api', router);
-
-// START THE SERVER
-// =============================================================================
+//============[SERVER START]===========
 app.listen(port);
 console.log('Mercury Bot Data API is alive and runs on port ' + port);
-
-const benProducts = {'messages': [{'text': 'Apple Watch'}, {'text': 'Osprey'}]}
-const tomProducts = {'messages': [{'text': 'Galaxy s10+'}, {'text': 'IPhone XS Max'}]}
-
+//============[PRODUCT DATABASE]============
 const benProductsDetails = [{
     title: 'Apple Watch',
     imageUrl: 'https://www.att.com/catalog/en/idse/Apple/Apple%20Watch%20Series%204%20-%2040mm/Space%20Gray%20Aluminum%20-%20Black%20Sport%20Loop-hero-zoom.png',
@@ -52,6 +42,8 @@ const tomProductsDetails = [{
     subtitle: 'After 10 years of mobile pioneering firsts, it\'s time to meet our latest and greatest innovation yet.',
     url: 'https://www.att.com/buy/phones/samsung-galaxy-s10-plus-128gb-prism-white.html'
 }];
+
+//
 function getProductsForScenario(scenarioId) {
     let productsForScenario = {};
     switch (scenarioId) {
@@ -62,8 +54,11 @@ function getProductsForScenario(scenarioId) {
             productsForScenario = benProductsDetails;
             break;
     }
+    log("Retrieved products for user:"+scenarioId);
+    log("products are:"+JSON.stringify(productsForScenario));
     return productsForScenario;
 }
+
 function buildImageElement(product) {
     return {
         "title": product.title,
@@ -78,27 +73,35 @@ function buildImageElement(product) {
         ]
     }
 }
+
 function buildTextElement(product) {
-    return {'text':product.title};
+    return {'text': product.title};
 }
+
 function buildImageMessages(products) {
     let accumElements = [];
     for (i = 0; i < products.length; i++) {
         accumElements.push(buildImageElement(products[i]));
     }
-    console.log(accumElements);
     messagesTemplate.messages[0].attachment.payload.elements = [];
     messagesTemplate.messages[0].attachment.payload.elements = accumElements;
     return messagesTemplate;
 }
+
 function buildTextMessages(products) {
     let accumTexts = [];
     for (i = 0; i < products.length; i++) {
         accumTexts.push(buildTextElement(products[i]));
     }
-    console.log(accumTexts);
     return {messages: accumTexts};
 }
+
+function log(message) {
+    setTimeout(() => {
+        console.log('[' + new Date().toUTCString() + '] ' + message)
+    }, 1500);
+}
+
 const messagesTemplate = {
     messages: [
         {
