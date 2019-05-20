@@ -10,6 +10,7 @@ var port = process.env.PORT || 8080;        // set our port
 var router = express.Router();              // get an instance of the express Router
 //============[ROUTES]===============
 router.get('/products/:scenario_id', function (req, res) {
+    console.log('======================GET PRODUCTS WITH TEXT FORMAT=====================')
     log('Received request for products for user ' + req.params.scenario_id);
     //Step # 1 : get products
     let productsToRender = getProductsForScenario(req.params.scenario_id.toLowerCase());
@@ -18,6 +19,7 @@ router.get('/products/:scenario_id', function (req, res) {
     res.json(messages);
 });
 router.get('/products-images/:scenario_id', function (req, res) {
+    console.log('=====================GET PRODUCTS WITH IMAGE PRODUCTS===============')
     log('Received request for products with images for user ' + req.params.scenario_id);
     //Step # 1 : get products
     let productsToRender = getProductsForScenario(req.params.scenario_id.toLowerCase());
@@ -25,6 +27,16 @@ router.get('/products-images/:scenario_id', function (req, res) {
     let messages = buildImageMessages(productsToRender);
     res.json(messages);
 });
+router.get('/support/fix-issue/:scenario_id', function (req, res) {
+    console.log('===================FIX ISSUE======================')
+    log('Received request to fix issue for incident id ' + req.params.scenario_id);
+    handleIssue(req.params.scenario_id).then(
+        resolved=>{
+            res.json('Issue solved')
+        }
+    )
+});
+
 app.use('/api', router);
 //============[SERVER START]===========
 app.listen(port);
@@ -43,7 +55,6 @@ const tomProductsDetails = [{
     url: 'https://www.att.com/buy/phones/samsung-galaxy-s10-plus-128gb-prism-white.html'
 }];
 
-//
 function getProductsForScenario(scenarioId) {
     let productsForScenario = {};
     switch (scenarioId) {
@@ -58,7 +69,7 @@ function getProductsForScenario(scenarioId) {
     log("products are:"+JSON.stringify(productsForScenario));
     return productsForScenario;
 }
-
+//==============[DATA FORMATTING FOR PRODUCT]===============
 function buildImageElement(product) {
     return {
         "title": product.title,
@@ -96,12 +107,6 @@ function buildTextMessages(products) {
     return {messages: accumTexts};
 }
 
-function log(message) {
-    setTimeout(() => {
-        console.log('[' + new Date().toUTCString() + '] ' + message)
-    }, 1500);
-}
-
 const messagesTemplate = {
     messages: [
         {
@@ -115,4 +120,25 @@ const messagesTemplate = {
             }
         }
     ]
+}
+//=========[ISSUE HANDLING/SUPPORT]==============
+async function handleIssue(incidentId)
+{
+    await sleep(3000);
+    log('Processing request, analyzing issue data...');
+    await sleep(3000);
+    log('Contacting relevant support personal...');
+    await sleep(3000);
+    log('Issue fix found, applying fix...')
+    await sleep(3000);
+    log('Issue fixed, sending report...');
+
+}
+//=========[INFRA]===================
+function log(message) {
+    console.log('[' + new Date().toUTCString() + '] ' + message);
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
