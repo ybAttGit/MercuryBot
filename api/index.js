@@ -10,8 +10,8 @@ var port = process.env.PORT || 8080;        // set our port
 var router = express.Router();              // get an instance of the express Router
 //============[ROUTES]===============
 router.get('/products/:scenario_id', function (req, res) {
-    console.log('======================GET PRODUCTS WITH TEXT FORMAT=====================')
-    log('Received request for products for user ' + req.params.scenario_id);
+    //console.log('======================GET PRODUCTS WITH TEXT FORMAT=====================')
+    //log('Received request for products for user ' + req.params.scenario_id);
     //Step # 1 : get products
     let productsToRender = getProductsForScenario(req.params.scenario_id.toLowerCase());
     //Step # 2 : Parse response
@@ -19,8 +19,8 @@ router.get('/products/:scenario_id', function (req, res) {
     res.json(messages);
 });
 router.get('/products-images/:scenario_id', function (req, res) {
-    console.log('=====================GET PRODUCTS WITH IMAGE PRODUCTS===============')
-    log('Received request for products with images for user ' + req.params.scenario_id);
+    //console.log('=====================GET PRODUCTS WITH IMAGE PRODUCTS===============')
+    //log('Received request for products with images for user ' + req.params.scenario_id);
     //Step # 1 : get products
     let productsToRender = getProductsForScenario(req.params.scenario_id.toLowerCase());
     //Step # 2 : Parse response
@@ -65,8 +65,8 @@ function getProductsForScenario(scenarioId) {
             productsForScenario = benProductsDetails;
             break;
     }
-    log("Retrieved products for user:"+scenarioId);
-    log("products are:"+JSON.stringify(productsForScenario));
+    //log("Retrieved products for user:"+scenarioId);
+    //log("products are:"+JSON.stringify(productsForScenario));
     return productsForScenario;
 }
 //==============[DATA FORMATTING FOR PRODUCT]===============
