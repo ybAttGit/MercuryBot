@@ -12,7 +12,7 @@ var port = process.env.PORT || 8080;        // set our port
 var router = express.Router();              // get an instance of the express Router
 router.get('/products/:scenario_id', function (req, res) {
     console.log('Received request for products for scenario ' + req.params.scenario_id);
-    switch(req.params.scenario_id.toLowerCase()) {
+    switch (req.params.scenario_id.toLowerCase()) {
         case 'tom':
             res.json(tomProducts);
             break;
@@ -20,6 +20,23 @@ router.get('/products/:scenario_id', function (req, res) {
             res.json(benProducts);
             break;
     }
+});
+
+router.get('/products-images/:scenario_id', function (req, res) {
+    console.log('Received request for products with images for scenario ' + req.params.scenario_id);
+    //Step # 1 : get products
+    let productsToRender = {};
+    switch (req.params.scenario_id.toLowerCase()) {
+        case 'tom':
+            productsToRender = tomProductsDetails;
+            break;
+        default:
+            productsToRender = benProductsDetails;
+            break;
+    }
+    //Step # 2 : Parse response
+    let messages = buildImageMessages(tomProductsDetails);
+    res.json(messages);
 });
 
 // REGISTER OUR ROUTES -------------------------------
@@ -33,3 +50,60 @@ console.log('Mercury Bot Data API is alive and runs on port ' + port);
 
 const benProducts = {'messages': [{'text': 'Apple Watch'}, {'text': 'Osprey'}]}
 const tomProducts = {'messages': [{'text': 'Galaxy s10+'}, {'text': 'IPhone XS Max'}]}
+
+const benProductsDetails = [{
+    title: 'Apple Watch',
+    imageUrl: 'https://www.att.com/catalog/en/idse/Apple/Apple%20Watch%20Series%204%20-%2040mm/Space%20Gray%20Aluminum%20-%20Black%20Sport%20Loop-hero-zoom.png',
+    subtitle: 'Apple Watch Series 4. Fundamentally redesigned and re-engineered to help you be even more active, healthy, and connected.',
+    url: 'https://www.att.com/buy/wearables/apple-watch-series-4-40mm-16gb-space-gray-aluminum-black-sport-loop.html'
+}];
+const tomProductsDetails = [{
+    title: 'Samsung Galaxy S10+ 128GB',
+    imageUrl: 'https://www.att.com/catalog/en/idse/Samsung/Samsung%20Galaxy%20S10+%20128GB/Prism%20White-hero-zoom.png',
+    subtitle: 'After 10 years of mobile pioneering firsts, it\'s time to meet our latest and greatest innovation yet.',
+    url: 'https://www.att.com/buy/phones/samsung-galaxy-s10-plus-128gb-prism-white.html'
+}];
+function buildImageElement(product) {
+    return {
+        "title": product.title,
+        "image_url": product.imageUrl,
+        "subtitle": product.subtitle,
+        "default_action": {
+            "type": "web_url",
+            "url": "https://rockets.chatfuel.com/store",
+            "messenger_extensions": true
+        },
+        "buttons": [
+            {
+                "type": "web_url",
+                "url": product.url,
+                "title": "View Item"
+            }
+        ]
+    }
+}
+
+function buildImageMessages(products) {
+    let accumElements = [];
+    for (i = 0; i < products.length; i++) {
+        accumElements.push(buildImageElement(products[i]));
+    }
+    console.log(accumElements);
+    messagesTemplate.messages[0].attachment.payload.elements = [];
+    messagesTemplate.messages[0].attachment.payload.elements = accumElements;
+    return messagesTemplate;
+}
+const messagesTemplate = {
+    messages: [
+        {
+            attachment: {
+                type: "template",
+                payload: {
+                    template_type: "list",
+                    top_element_style: "large",
+                    elements: []
+                }
+            }
+        }
+    ]
+}
